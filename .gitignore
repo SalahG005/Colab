@@ -1,0 +1,8 @@
+node_modules/
+.env
+backend-main/images/*
+!backend-main/images/.gitkeep
+_rapport_extract.txt
+_cdc_extract.txt
+*.log
+.DS_Store

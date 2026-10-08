@@ -1,0 +1,332 @@
+// Variables
+$primary-color: #E2A852;
+$secondary-color: #ff4d4f;
+$accent-color: #4cc9f0;
+$light-color: #f8f9fa;
+$dark-color: #212529;
+$success-color: #4bb543;
+$border-radius: 12px;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-style {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Modal Overlay
+.campaign-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+// Modal Container
+.campaign-modal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: $dark-color;
+  overflow: hidden;
+  
+  &__header {
+    background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  &__header-content {
+    max-width: 80%;
+  }
+  
+  &__title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  &__meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
+  &__status {
+    @include flex-center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    
+    .icon-status {
+      color: $success-color;
+    }
+  }
+  
+  &__date, &__budget {
+    @include flex-center;
+    gap: 0.5rem;
+  }
+  
+  &__close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  
+  &__content {
+    padding: 2rem;
+  }
+  
+  &__tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+  }
+  
+  &__tab {
+    padding: 0.8rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &.active {
+      color: $primary-color;
+      border-bottom-color: $primary-color;
+    }
+    
+    &:hover:not(.active) {
+      color: $dark-color;
+    }
+  }
+  
+  &__tab-content {
+    min-height: 300px;
+  }
+}
+
+// Campaign Details
+.campaign-details {
+  &__section {
+    margin-bottom: 2rem;
+    
+    &-title {
+      @include flex-center;
+      gap: 0.8rem;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: $primary-color;
+      
+      .icon-section {
+        font-size: 1.1rem;
+      }
+    }
+  }
+  
+  &__description {
+    line-height: 1.6;
+    color: #555;
+    font-size: 1.05rem;
+  }
+  
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  &__card {
+    @include card-style;
+    
+    &-title {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: $secondary-color;
+    }
+  }
+  
+  &__list {
+    padding-left: 1.2rem;
+    margin: 0;
+    
+    &-item {
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+      
+      &::marker {
+        color: $accent-color;
+      }
+    }
+  }
+}
+
+// Tags
+.campaign-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.campaign-tag {
+  background: #e0e8ff;
+  color: $primary-color;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+// Stats
+.campaign-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.campaign-stat {
+  text-align: center;
+  
+  &__value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $primary-color;
+    line-height: 1;
+  }
+  
+  &__label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.3rem;
+  }
+}
+
+// Media
+.campaign-media {
+  &__main {
+    @include card-style;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  &__image, &__video {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: $border-radius;
+  }
+  
+  &__gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+// Related Campaigns
+.related-campaigns {
+  &__title {
+    font-size: 1.3rem;
+    color: $primary-color;
+    margin-bottom: 1.5rem;
+  }
+  
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.related-campaign {
+  @include card-style;
+  
+  &__title {
+    margin-top: 0;
+    color: $secondary-color;
+  }
+  
+  &__description {
+    color: #666;
+    line-height: 1.5;
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 768px) {
+  .campaign-modal {
+    width: 95vw;
+    height: 90vh;
+    
+    &__header {
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+    
+    &__header-content {
+      max-width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__meta {
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    
+    &__tabs {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+  
+  .campaign-details__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .campaign-media__gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

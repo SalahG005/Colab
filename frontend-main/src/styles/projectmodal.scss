@@ -1,0 +1,397 @@
+$primary-color: #D45742;
+$secondary-color: #ffc107;
+$accent-color: #ffc107;
+$light-color: #f8f9fa;
+$dark-color: #212529;
+$success-color: #4bb543;
+$warning-color: #D45742;
+$danger-color: #D45742;
+$border-radius: 12px;
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$transition: all 0.3s ease;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-style {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+  transition: $transition;
+}
+
+// Modal Overlay
+.brief-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+// Modal Container
+.brief-modal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: $dark-color;
+  overflow: hidden;
+  
+  &__header {
+    background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  &__header-content {
+    max-width: 80%;
+  }
+  
+  &__title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  &__meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    flex-wrap: wrap;
+  }
+  
+  &__status {
+    @include flex-center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    
+    .icon-status {
+      color: $success-color;
+    }
+  }
+  
+  &__date, &__budget {
+    @include flex-center;
+    gap: 0.5rem;
+  }
+  
+  &__close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  
+  &__content {
+    padding: 2rem;
+  }
+  
+  &__tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+  }
+  
+  &__tab {
+    padding: 0.8rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: $transition;
+    @include flex-center;
+    gap: 0.5rem;
+    
+    &.active {
+      color: $primary-color;
+      border-bottom-color: $primary-color;
+    }
+    
+    &:hover:not(.active) {
+      color: $dark-color;
+    }
+    
+    .icon-tab {
+      font-size: 0.9rem;
+    }
+  }
+  
+  &__tab-content {
+    min-height: 300px;
+  }
+}
+
+// Brief Details
+.brief-details {
+  &__section {
+    margin-bottom: 2rem;
+    
+    &-title {
+      @include flex-center;
+      gap: 0.8rem;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: $primary-color;
+      
+      .icon-section {
+        font-size: 1.1rem;
+      }
+    }
+  }
+  
+  &__description {
+    line-height: 1.6;
+    color: #555;
+    font-size: 1.05rem;
+  }
+  
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  &__card {
+    @include card-style;
+    
+    &--full {
+      grid-column: 1 / -1;
+    }
+    
+    &-title {
+      @include flex-center;
+      gap: 0.6rem;
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: $secondary-color;
+      
+      .icon-card {
+        font-size: 0.9rem;
+        color: $accent-color;
+      }
+    }
+  }
+  
+  &__list {
+    padding-left: 1.2rem;
+    margin: 0;
+    
+    &-item {
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+      
+      &::marker {
+        color: $accent-color;
+      }
+    }
+  }
+  
+  &__stats {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  &__stat {
+    text-align: center;
+    
+    &-value {
+      display: block;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: $primary-color;
+      line-height: 1;
+    }
+    
+    &-label {
+      display: block;
+      font-size: 0.8rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.3rem;
+    }
+  }
+  
+  &__media {
+    margin-top: 1rem;
+    
+    &-image, &-video {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// Tags
+.brief-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.brief-tag {
+  background: #e0e8ff;
+  color: $primary-color;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+// Brief Actions
+.brief-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.action-card {
+  @include card-style;
+  
+  &--primary {
+    border-left: 4px solid $primary-color;
+  }
+  
+  &--success {
+    border-left: 4px solid $success-color;
+  }
+  
+  &__title {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    color: $secondary-color;
+  }
+  
+  &__description {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+  
+  &__btn {
+    @include flex-center;
+    gap: 0.5rem;
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    
+    &:hover {
+      background: $secondary-color;
+      transform: translateY(-2px);
+    }
+    
+    &--secondary {
+      background: white;
+      color: $primary-color;
+      border: 1px solid $primary-color;
+      
+      &:hover {
+        background: #f0f4ff;
+      }
+    }
+    
+    .icon-btn {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Form Elements
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: $dark-color;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: $border-radius;
+  font-size: 1rem;
+  transition: $transition;
+  
+  &:focus {
+    border-color: $primary-color;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+  
+  &[type="textarea"] {
+    min-height: 120px;
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 768px) {
+  .brief-modal {
+    width: 95vw;
+    height: 90vh;
+    
+    &__header {
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+    
+    &__header-content {
+      max-width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__meta {
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    
+    &__tabs {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+  
+  .brief-details__grid {
+    grid-template-columns: 1fr;
+  }
+}

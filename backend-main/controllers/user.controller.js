@@ -1,0 +1,332 @@
+const User = require("../models/user.model.js");
+const Creator = require("../models/creator.model.js");
+const Advertiser = require("../models/advertiser.model.js");
+const { cloudinaryUploadFile, cloudinaryRemoveImage } = require("../utils/cloudinary");
+
+
+
+
+
+const GetUser = async (req, res) => {
+  console.log("Inside GetUser");
+
+  try {
+    const userId = req.userId; // Set by verifyToken middleware
+    const userRecord = await User.findById(userId).select("-password");
+
+    if (!userRecord) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    let additionalData = {};
+    
+    // Check if the user is an Influencer (Creator)
+    if (userRecord.roles.includes("Influencer")) {
+      const creator = await Creator.findOne({ userId: userId });
+      if (creator) {
+        additionalData.creator = creator;
+      }
+    }
+
+    // Check if the user is a Brand (Advertiser)
+    if (userRecord.roles.includes("Brand")) {
+      const advertiser = await Advertiser.findOne({ userId: userId });
+      if (advertiser) {
+        additionalData.advertiser = advertiser;
+      }
+    }
+
+    console.log("User Record:", userRecord);
+    return res.status(200).json({
+      success: true,
+      userProfile: { ...userRecord.toObject(), ...additionalData }, // Merge the user data with additional data
+    });
+
+  } catch (err) {
+    console.error("GetUser Error:", err);
+    return res.status(500).json({ success: false, message: "Could not verify identity" });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  const { username, firstName, lastName, description, tags, categories, instagram, tiktok, instafollowers, tiktokfollowers, companyName, website, address, industry } = req.body;
+  const userId = req.userId;
+
+  try {
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    console.log("User Data Before Update:", user);
+
+    // Update user fields
+    user.username = username || user.username;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.description = description || user.description;
+    user.tags = tags || user.tags;
+    user.categories = categories || user.categories;
+
+    // Handle profile photo upload (Cloudinary integration)
+    if (req.file) {
+      console.log("Received Profile Photo:", req.file); // Log the uploaded file
+
+      // If the photo is different, update
+      if (user.profilePhoto?.publicId) {
+        console.log("Removing old profile photo...");
+        await cloudinaryRemoveImage(user.profilePhoto.publicId); // Remove the old image
+      }
+
+      const uploadedPhoto = await cloudinaryUploadFile(req.file.path); // Use file path from multer
+      user.profilePhoto = {
+        url: uploadedPhoto.secure_url,
+        publicId: uploadedPhoto.public_id,
+        resourceType: uploadedPhoto.resource_type,
+      };
+
+      console.log("Updated Profile Photo:", user.profilePhoto);
+    }
+
+    // Save updated user profile
+    const savedUser = await user.save();
+    console.log("Saved User:", savedUser);
+
+    // Check if the user is an influencer or advertiser and update accordingly
+    if (user.roles.includes("Influencer")) {
+      const creator = await Creator.findOne({ userId: userId });
+      if (creator) {
+        console.log("Updating Influencer Data...");
+        creator.socialLinks.instagram = instagram;
+        creator.socialLinks.tiktok = tiktok;
+        creator.audience.instafollowers = instafollowers;
+        creator.audience.tiktokfollowers = tiktokfollowers;
+
+        await creator.save();
+      }
+    }
+
+    if (user.roles.includes("Brand")) {
+      const advertiser = await Advertiser.findOne({ userId: userId });
+      if (advertiser) {
+        console.log("Updating Brand Data...");
+        advertiser.companyName = companyName || advertiser.companyName;
+        advertiser.website = website || advertiser.website;
+        advertiser.address = address || advertiser.address;
+        advertiser.industry = industry || advertiser.industry;
+
+        await advertiser.save();
+      }
+    }
+
+    res.status(200).json({ success: true, message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+// In user.controller.js
+const getCreatorsCount = async (req, res) => {
+  try {
+    const count = await Creator.countDocuments();
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const getAdvertisersCount = async (req, res) => {
+  try {
+    const count = await Advertiser.countDocuments();
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const creatorPopulate = [
+  { path: "userId", select: "username email description categories instaUsername tiktokUsername profilePhoto createdAt isVerified isSuspended" },
+  { path: "score" },
+];
+
+const getCreators = async (req, res) => {
+  try {
+    const creators = await Creator.find().populate(creatorPopulate);
+    res.status(200).json({ success: true, creators });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const verifyCreator = async (req, res) => {
+  try {
+    const creator = await Creator.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: true },
+      { new: true }
+    );
+    if (!creator) {
+      return res.status(404).json({ success: false, message: "Creator not found" });
+    }
+    await User.findByIdAndUpdate(creator.userId, { isVerified: true });
+    res.status(200).json({ success: true, creator });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const suspendCreator = async (req, res) => {
+  try {
+    const creator = await Creator.findByIdAndUpdate(
+      req.params.id,
+      { isSuspended: req.body.isSuspended !== false },
+      { new: true }
+    );
+    if (!creator) {
+      return res.status(404).json({ success: false, message: "Creator not found" });
+    }
+    await User.findByIdAndUpdate(creator.userId, { isSuspended: creator.isSuspended });
+    res.status(200).json({ success: true, creator });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const deleteCreator = async (req, res) => {
+  try {
+    const creator = await Creator.findById(req.params.id);
+    if (!creator) {
+      return res.status(404).json({ success: false, message: "Creator not found" });
+    }
+    await User.findByIdAndDelete(creator.userId);
+    await Creator.findByIdAndDelete(creator._id);
+    res.status(200).json({ success: true, message: "Creator deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const getAdvertisers = async (req, res) => {
+  try {
+    const advertisers = await Advertiser.find()
+      .populate("userId", "username email createdAt isVerified isSuspended");
+    res.status(200).json({ success: true, advertisers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const verifyAdvertiser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isVerified: true },
+      { new: true }
+    ).select("-password");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const suspendAdvertiser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isSuspended: req.body.isSuspended !== false },
+      { new: true }
+    ).select("-password");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const deleteUserAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    await Advertiser.findOneAndDelete({ userId: user._id });
+    await Creator.findOneAndDelete({ userId: user._id });
+    await User.findByIdAndDelete(user._id);
+    res.status(200).json({ success: true, message: "Account deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const getCreatorCategories = async (req, res) => {
+  try {
+    const names = await User.distinct("categories", { roles: "Influencer" });
+    res.status(200).json({ success: true, categories: names.filter(Boolean) });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const searchCreators = async (req, res) => {
+  try {
+    const searchTerm = (req.query.searchTerm || "").trim().toLowerCase();
+    const minScore = Number(req.query.minScore || 0);
+    const maxScore = Number(req.query.maxScore || 100);
+    let selected = req.query.categories || [];
+    if (typeof selected === "string") {
+      selected = selected ? selected.split(",") : [];
+    }
+
+    const creators = await Creator.find().populate(creatorPopulate);
+    const results = creators
+      .map((creator) => {
+        const user = creator.userId || {};
+        const scoreValue = creator.score?.totalScore ?? 0;
+        return {
+          id: creator._id,
+          username: user.username || "",
+          profilePhoto: user.profilePhoto?.url || "",
+          score: scoreValue,
+          bio: user.description || "",
+          categories: user.categories || [],
+        };
+      })
+      .filter((creator) => {
+        const matchesTerm = !searchTerm
+          || creator.username.toLowerCase().includes(searchTerm)
+          || creator.bio.toLowerCase().includes(searchTerm);
+        const matchesCategories = selected.length === 0
+          || selected.some((category) => creator.categories.includes(category));
+        const matchesScore = creator.score >= minScore && creator.score <= maxScore;
+        return matchesTerm && matchesCategories && matchesScore;
+      });
+
+    res.status(200).json({ success: true, creators: results });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = {
+  GetUser,
+  updateProfile,
+  getCreatorsCount,
+  getAdvertisersCount,
+  getCreators,
+  getAdvertisers,
+  suspendAdvertiser,
+  verifyAdvertiser,
+  verifyCreator,
+  suspendCreator,
+  deleteCreator,
+  deleteUserAccount,
+  getCreatorCategories,
+  searchCreators,
+};
