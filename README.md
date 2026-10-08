@@ -13,7 +13,49 @@ Colab is the graduation project (PFE) of **Bechir Guerriche** and **Salah Gnaoui
 | Host company | [ACCESS Group](https://www.access.tn/) |
 | Stack | React, Node.js, Express, MongoDB (MERN) |
 
+<p>
+  <img src="docs/images/access-group.png" alt="ACCESS Group presence: headquarters in Tunisia and client countries" width="720">
+</p>
+
 The specification behind the product is the cahier des charges **PFEDV08** (version 1.0.0, 4 February 2025, responsible Mohamed Ali Elloumi). This repository is the implemented platform described in the final report.
+
+The figures below are taken from that report.
+
+### Sign-up
+
+A visitor chooses Influencer or Brand, then fills the role-specific form. Creators enter their Instagram and TikTok usernames before the account is verified by email.
+
+<p>
+  <img src="docs/images/signup.png" alt="Colab sign-up: choose Influencer or Brand" width="720">
+</p>
+<p>
+  <img src="docs/images/creator-signup.png" alt="Creator registration form" width="720">
+</p>
+
+### Brand workspace
+
+The brand dashboard lists briefs with budget, deadline, and assignment status. Opening a brief shows categories, platform, and the reference sheet. The Campaigns tab collects the videos creators submitted.
+
+<p>
+  <img src="docs/images/brand-briefs.png" alt="Brand dashboard with briefs" width="720">
+</p>
+<p>
+  <img src="docs/images/brief-details.png" alt="Brief details for Orange Student Boost 2025" width="720">
+</p>
+<p>
+  <img src="docs/images/brief-campaigns.png" alt="Campaign submissions attached to a brief" width="720">
+</p>
+<p>
+  <img src="docs/images/campaign-review.png" alt="Approve or reject a campaign and watch its media" width="720">
+</p>
+
+### Creator search
+
+Brands filter creators by name, bio, or category and compare follower counts with the score out of 100.
+
+<p>
+  <img src="docs/images/discover-creators.png" alt="Discover Creators with follower counts and scores" width="720">
+</p>
 
 ## 1. Why Colab exists
 
@@ -133,7 +175,14 @@ The report specifies OpenAI GPT-3.5-turbo, with prompts written in French, one p
 
 ## 4. How the project was run
 
-The team used Scrum. Each sprint lasted about four weeks and ended with a usable increment. Roles were Product Owner, Scrum Master, and the development team. Events were sprint planning, daily stand-up, sprint review, and retrospective. Requirements were modeled in UML (use cases, classes, sequences) with StarUML and diagrams.net.
+The team used Scrum. Each sprint lasted about four weeks and ended with a usable increment.
+
+<p>
+  <img src="docs/images/sprint-plan.png" alt="Three sprints from 17 February 2025 to 24 May 2025" width="720">
+</p>
+<p>
+  <img src="docs/images/scrum-team.png" alt="Scrum team roles" width="640">
+</p> Roles were Product Owner, Scrum Master, and the development team. Events were sprint planning, daily stand-up, sprint review, and retrospective. Requirements were modeled in UML (use cases, classes, sequences) with StarUML and diagrams.net.
 
 Story points follow the Fibonacci scale. Priority is High or Medium.
 
@@ -208,6 +257,19 @@ The logical architecture is MVC.
 - **Model.** Mongoose schemas in `backend-main/models`: `User`, `Advertiser`, `Creator`, `Brief`, `Campaign`, `Score`, `Notification`, `Payment`, `Category`.
 - **View.** React pages and components in `frontend-main/src`, styled with Sass.
 - **Controller.** Express route handlers in `backend-main/controllers`, reached through `backend-main/routes`.
+
+<p>
+  <img src="docs/images/mvc-architecture.png" alt="MVC architecture: model, view, and controller" width="640">
+</p>
+<p>
+  <img src="docs/images/deployment.png" alt="Deployment diagram: React, Express, MongoDB, Cloudinary, Mailtrap, and scoring" width="720">
+</p>
+<p>
+  <img src="docs/images/global-use-case.png" alt="Global use case diagram for guest, brand, creator, admin, and the scoring system" width="520">
+</p>
+<p>
+  <img src="docs/images/sprint1-use-case.png" alt="Sprint 1 use case diagram" width="640">
+</p>
 
 Physically this is a MERN deployment: the browser runs the React app, Express listens for the API, and MongoDB stores the documents. External services sit beside the API: Cloudinary for media, Mailtrap for mail, and Ollama or OpenAI for the qualitative score.
 
